@@ -146,8 +146,6 @@ This happens because of the nature of parallel programming; some tasks may requi
 - kernel
 - threads
 - blocks
-- warps
-- host, global, device memory
 
 A GPU is a piece of hardware similar to a CPU, and was originally designed for video games, in order for their graphics to load. Coincidentally, they were found to be useful in areas other than gaming- such as parallel computing. They are perfect for running **embrassingly parallel** algorithms, such as applying a grayscale filter to an image- a task requiring little to no synchronization and can be done in a very easy, efficient, parallel manner. This is all due to how their hardware is designed, as seen here [4]: 
 
@@ -158,22 +156,65 @@ Let's analyze the above image a bit further.
 
 What are the first things that you notice?
 
-On the right, you can see many more smaller green boxes than the left; that's because GPUs have many more **cores** than CPUs do. But these cores are not as powerful as the ones in a CPU- they are optimized for throughput. A GPU breaks down a task, executing it in parallel into its many cores. It is also important to note that each core has SIMD execution. 
+On the right, you can see many more smaller green boxes than the left; that's because GPUs have many more **cores** than CPUs do. But these cores are not as powerful as the ones in a CPU- they are optimized for throughput (as seen by the small caches too). A GPU breaks down a task, executing it in parallel into its many cores. It is also important to note that each core has SIMD execution. 
 
 
 Essentially, back to the restaurant example- the CPU is the head chef that has to organize everyone and all of the dishes on the menu (more complex operation), while the GPU is the line cook that is flipping 100 burgers in one minute (simpler operation, with a higher throughput).
 
 ----
 
-// kernel thread block warp 
-// memory allocation host device 
-// 
+In CUDA, each task is broken into smaller ones: those are organized in threads, blocks, and warps- all within the grid. 
+
 ![alt text](image-3.png) [5]
 
+A **thread** is the smallest unit of execution in a GPU- ie. it can render a single pixel in an image. Each one has its own ID number to identify it- and it can be three-dimensional. It can have private memory. The ID number for a one-dimensional thread in CUDA is the following:
+
+```C++
+int i = threadIdx.x;  //ID of thread
+```
+A **block** or a group of threads is executed by an SM (or Streaming Multiprocessor) in the GPU, meaning many cores. Memory can be shared within a block. The syntax for a block ID is the following, and similarly has three dimensions:
+
+```C++
+int i = blockIdx.x;  //ID of block 
+// But there is also a block dimension such as 
+blockDim.x = 16;
+blockDim.y = 16; 
+// which would create a block of 16 threads across and 16 threads down, if we wanted to use it in a 2D data structure, such as an image.  
+```
+A **warp** is a group of 32 threads in a block. Each thread block is divided into warps, where the same instruction is executed (SIMD) -- you won't need to know much about this right now, but it's good to have an idea of how it works for the future. 
+
+Lastly, the **grid** is where the thread blocks "live" on the GPU. In addition, the **kernel** is the function that runs on the GPU; it can be defined using  \_\_global\_\_, and invoked with <<<...>>>. The invocation can take parameters such as <<< number of blocks in the program, number of threads per block >>>, which can be defined by the programmer. 
+
+Below is an example of vector addition, illustrating the previous ideas:
+
+```C++
+// Define the kernel
+__global__ void vec_add(float* A, float* B, float* C)
+{
+    int i = threadIdx.x;
+    C[i] = A[i] + B[i];
+}
+
+int main()
+{
+    ...
+    // Kernel invocation with arbitrary blocks and threads
+    vec_add<<<num_of_blocks, num_of_threads>>>(A, B, C);
+    ...
+}
+```
+Below, we can see the different memory arrangements that exists in the GPU: 
 
 ![alt text](image-4.png) [6]
 
+The device memory in the image above is in our GPU, while the host memory is on the CPU. 
 
+Each block can have its own shared memory between threads, as mentioned, while each thread can have its own local memory- **global memory** is shared amongst all blocks, **constant memory** is read-only that remains constant, and **texture memory** is also read-only that is used for spatial locality and graphics (such as in 2D images). 
+
+
+### Summary 
+
+A GPU is a highly parallel processing unit; in CUDA programming, tasks are divided into **threads**, grouped into **blocks**, and organized within a **grid**. Threads within a block can share shared memory and are executed on Streaming Multiprocessors (SMs). The **kernel** is a function running on the GPU, processing data in parallel, and can be invoked with <<< ... >>>. Different memory types, such as **global**, **shared**, **constant**, and **texture** memory, optimize performance based on access patterns.
 
 
 
