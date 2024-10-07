@@ -222,7 +222,7 @@ A GPU is a highly parallel processing unit; in CUDA programming, tasks are divid
 **Aim** : To see and then implement a CUDA program on your own.
 
 >#### Environment 
-
+nvcc
 
 >#### Compilation
 
