@@ -42,7 +42,7 @@ These notes are based on the book Programming Massively Parallel Processors by D
 
 - Warps and performance  
 
-- Some more memory considerations  
+- Some more memory considerations - streams pinned memory
 
 - <mark> *** last example  
 
@@ -250,7 +250,6 @@ Theoretically-since this course is based on the NTUA course- you can open up you
 For compiling the program you can make a file called Makefile with the following:
 
 ```bash 
-
 usr/local/cuda-12.1/bin/nvcc  your_program.cu -O3 -lstdc++ -o your_program.out
 
 #O3 are the compiler optimizations
@@ -268,20 +267,87 @@ So that CUDA can run on a GPU.
 
 >**Hello World in CUDA**
 
+Let's start by creating a "hello world"!
+
+Create a file in your chosen code editor called
+```  
+hello.cu
+```
+
+Then, let's think of how we would do this as a serial program in C. 
+
+```C
+#include <stdio.h> 
+
+int main() {
+    printf("Hello World from the CPU!"); 
+    return 0; 
+}
+```
+But what we want to do is to run this on a GPU. Let's add a kernel function by adding the global attribute. 
+
+
+```C
+#include <stdio.h> 
+
+__global__ void hello_world() {
+    printf("Hello World from the GPU!");
+}
+
+int main() {
+    // what to do here?
+    return 0; 
+}
+```
+We now need to invoke the kernel- try playing around with the number of blocks and threads. Before you run this, how many hello's are you expecting to see? When you do run this, does it match your prediction?
+
+```C
+#include <stdio.h> 
+
+__global__ void hello_world() {
+    printf("Hello World from GPU!");
+    // try printf("Hello from thread %d\n", threadIdx.x); after you are done
+}
+
+int main() {
+    printf("Hello World from the CPU!"); 
+
+    //Launch the kernel with 1 block and 10 threads
+    hello_world<<<1, 10>>>(); 
+
+    //Wait for the GPU to finish before continuing on the CPU
+    cudaDeviceSynchronize(); 
+    return 0; 
+}
+```
+
+So why did we add the following? 
+
+```C
+cudaDeviceSynchronize(); 
+```
+When a kernel is launched in a CUDA program, it is done so asynchronously- the CPU does not wait for the GPU to finish, as they are different pieces of hardware, so we need to add a "reminder" for it to do so. 
+
+
+>**Vector Addition in CUDA**
+
+Let's try doing something a bit more complicated now 
+
+
+1D convolution outline after
 
 
 
-First program -  
+- Parallelizing for-loops and adding vectors in CUDA 
 
-Hello world  
+- Race conditions and atomic operations  
 
+- <mark> Another example ***  
 
-threads 
+- Warps and performance  
 
-show vector addition example  
+- Some more memory considerations - streams pinned memory
 
-Do matrix multiplication 
- 
 
 
 
