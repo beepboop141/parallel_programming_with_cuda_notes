@@ -147,7 +147,7 @@ This happens because of the nature of parallel programming; some tasks may requi
 - threads
 - blocks
 
-A GPU is a piece of hardware similar to a CPU, and was originally designed for video games, in order for their graphics to load. Coincidentally, they were found to be useful in areas other than gaming- such as parallel computing. They are perfect for running **embrassingly parallel** algorithms, such as applying a grayscale filter to an image- a task requiring little to no synchronization and can be done in a very easy, efficient, parallel manner. This is all due to how their hardware is designed, as seen here [4]: 
+A GPU is a piece of hardware similar to a CPU, and was originally designed for video games, in order for their graphics to load. Coincidentally, they were found to be useful in areas other than gaming- such as parallel computing. They are perfect for running **embarrassingly parallel** algorithms, such as applying a gray scale filter to an image- a task requiring little to no synchronization and can be done in a very easy, efficient, parallel manner. This is all due to how their hardware is designed, as seen here [4]: 
 
 
 ![alt text](image-2.png) 
@@ -198,18 +198,37 @@ __global__ void vec_add(float* A, float* B, float* C)
 int main()
 {
     ...
-    // Kernel invocation with arbitrary blocks and threads
-    vec_add<<<num_of_blocks, num_of_threads>>>(A, B, C);
+    // Kernel invocation with arbitrary number of blocks and threads
+    int num_of_blocks = 1; 
+    int num_of_threads_per_block = 1; 
+    vec_add<<<num_of_blocks, num_of_threads_per_block>>>(A, B, C);
     ...
 }
 ```
+Please note: usually blocks and threads are in powers of 2 for easier computation. They are also always positive integers. 
+
 Below, we can see the different memory arrangements that exists in the GPU: 
 
 ![alt text](image-4.png) [6]
 
 The device memory in the image above is in our GPU, while the host memory is on the CPU. 
 
+There are two other declarations of a function that can be made- \_\_host\_\_ and \_\_device\_\_ , each one executed and called by the host and the device respectively. 
+
 Each block can have its own shared memory between threads, as mentioned, while each thread can have its own local memory- **global memory** is shared amongst all blocks, **constant memory** is read-only that remains constant, and **texture memory** is also read-only that is used for spatial locality and graphics (such as in 2D images). 
+
+Similar to the \_\_global\_\_ , \_\_host\_\_, and \_\_device\_\_ attributes, the \_\_device\_\_ ,  \_\_shared\_\_ and \_\_constant\_\_ attributes can be used in front of variables to declare where they should live within the memory of the GPU. 
+
+**\_\_device\_\_** - a variable that lives in the global memory of the device (slower to access)  
+> good for large datasets
+
+ **\_\_shared\_\_** - a variable that lives in the shared memory of the blocks (faster to access, but limited within the threads of the block)
+ > good for cooperation between threads of a block
+
+
+ **\_\_constant\_\_** - a variable in the read-only constant memory of the GPU that is faster to access since it is cached, but limited in size
+>good for constant variables 
+
 
 
 ### Summary 
@@ -221,10 +240,33 @@ A GPU is a highly parallel processing unit; in CUDA programming, tasks are divid
 ## Writing Your First Program (yay!!!)
 **Aim** : To see and then implement a CUDA program on your own.
 
->#### Environment 
-nvcc
+>#### Environment and Compilation
+First things first-setting up your environment. 
 
->#### Compilation
+CUDA programs have a .cu <mark> suffix??? </mark>, and are executed using the nvcc compiler. To run a CUDA program, you first need to set up the makefile. 
+
+Theoretically-since this course is based on the NTUA course- you can open up your terminal and connect to the Scirouter. If you can't, then maybe a quick google search can help you, or a google-colab notebook as to have a GPU available. For the purposes of these notes however, this is what we will refer to. 
+
+For compiling the program you can make a file called Makefile with the following:
+
+```bash 
+
+usr/local/cuda-12.1/bin/nvcc  your_program.cu -O3 -lstdc++ -o your_program.out
+
+#O3 are the compiler optimizations
+```
+Replacing your_program with the name of your program. 
+
+In order for the program to compile you can use a <mark> den kserw ti machine </mark> in the interactive mode, with the flag -I. 
+
+Before compiling, make sure to execute the command:
+```
+export CUDA_VISIBLE_DEVICES=1
+```
+
+So that CUDA can run on a GPU. 
+
+>**Hello World in CUDA**
 
 
 
@@ -234,6 +276,7 @@ First program -
 Hello world  
 
 
+threads 
 
 show vector addition example  
 
