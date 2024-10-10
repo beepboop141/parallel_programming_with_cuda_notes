@@ -41,7 +41,7 @@ These notes are based on the book Programming Massively Parallel Processors by D
 -  Summary
 
 
-***Please note: the following two sections are theory-based, rather than showing code examples*** 
+***Please note: the following two sections are theory-based, rather than showing code examples.*** 
 
 (*) Beware: faster does not mean more efficient; performance, convenience, and cost are all taken into consideration when designing a parallel program.
 
@@ -58,8 +58,7 @@ We know that parallel programming is a method of computing by taking a large tas
 
 First, lets see in which ways we can do that- with some real-life examples. 
 
-Let's start with **task parallelism**; it's the simultaneous execution of different tasks independent of each other. For example, pretend you are at a restaurant, ordering a burger. The server sends your order over to the kiidea- tiled matrix multiplication 
-tchen and the task parallelism begins! Instead of waiting for the burger to _finish_ cooking, so that your fries can _start_ cooking, it's all done at the same time. The cook on the grill is flipping your burgers and buns, while someone else is cutting the onions (whilst possibly crying), and the fries are almost done on the other side of the kitchen-- all coming together in the end. So, your food stays hot, and you don't have to wait hours for a burger. 
+Let's start with **task parallelism**; it's the simultaneous execution of different tasks independent of each other. For example, pretend you are at a restaurant, ordering a burger. The server sends your order over to the kitchen and the task parallelism begins! Instead of waiting for the burger to _finish_ cooking, so that your fries can _start_ cooking, it's all done at the same time. The cook on the grill is flipping your burgers and buns, while someone else is cutting the onions (whilst possibly crying), and the fries are almost done on the other side of the kitchen-- all coming together in the end. So, your food stays hot, and you don't have to wait hours for a burger. 
 
 **Data parallelism** on the other hand is when the same task is done on subdivisions of the same dataset. It is similar to completing a puzzle with your friends; you all have the same task, but each person has a different piece of data (ie. area of the puzzle). 
 
@@ -83,7 +82,7 @@ Another main idea is **race conditions**, which cause inaccurate results and pro
 A real-life example is the task of grabbing a pen, and writing one's name with it on a piece of paper. If that task is assigned to only one person (say, Rasputin), we can make sure that Rasputin's name will be the one we will see. But what if now two people- Rasputin and Czar Nicholas have the same task- what name will we see now? Or will chaos ensue? We can't be certain--neither of our result, nor of how accurate it will be. However, if the task given to the two of them was to just look at the pen, we would know the outcome would be the same- since nothing about the pen, or our paper, would have changed. 
 
 
-We can therefore conclude that simultaneous writes create race conditions, while reads do not. 
+We can therefore conclude that simultaneous writes will create race conditions, while reads do not, because we are changing data (the name) in our memory (the paper).
 
 **Synchronization** is another way to mitigate problems arising from parallel programming techniques, such as race conditions. If in the above example Rasputin went first, then the Czar (or vice-versa), we could make sure we had names on our paper, without any chaos. 
 
@@ -108,8 +107,7 @@ $$
 Where:
 - P is the proportion of the program that can be parallelized.
 - N is the increase in speed for the part of the task that gets better because of improved system resources (ie. more people in aforementioned parallelized tasks).  
-- 1 - P is the portion of the program that remains sequential and cannot be parallelized.
-[3]
+- 1 - P is the portion of the program that remains sequential and cannot be parallelized[3].
 --------
 
 
@@ -118,7 +116,7 @@ Sometimes, the speedup of a program may be unexpected (in a bad way), and many t
 
 ![alt text](image-1.png)
 
-This happens because of the nature of parallel programming; some tasks may require more work than others and take more time, or can't be parallelized at all. Synchronization also takes more time. Data may need to be accessed simultaneously, and the bandwidth of a system may not be sufficient enough to support it. Sometimes, certain algorithms just aren't built to be parallelized and have to be changed to do so. 
+This happens because of the nature of parallel programming; some tasks may require more work than others and take more time, or can't be parallelized at all. Synchronization also takes more time. Data may need to be accessed simultaneously, and the bandwidth of a system may not be sufficient enough to support so many data reads/writes. Sometimes, certain algorithms just aren't built to be parallelized and have to be changed to do so. 
 
 
 ## GPU Architecture
@@ -145,9 +143,9 @@ Essentially, back to the restaurant example- the CPU is the head chef that has t
 
 ----
 
-In CUDA, each task is broken into smaller ones: those are organized in threads, blocks, and warps- all within the grid. 
+In CUDA, each task is broken into smaller ones: those are organized in threads, blocks, and warps- all within the grid [5]. 
 
-![alt text](image-3.png) [5]
+![alt text](image-3.png) 
 
 A **thread** is the smallest unit of execution in a GPU- ie. it can render a single pixel in an image. Each one has its own ID number to identify it- and it can be three-dimensional. It can have private memory. The ID number for a one-dimensional thread in CUDA is the following:
 
@@ -161,7 +159,8 @@ int i = blockIdx.x;  //ID of block
 // But there is also a block dimension such as 
 blockDim.x = 16;
 blockDim.y = 16; 
-// which would create a block of 16 threads across and 16 threads down, if we wanted to use it in a 2D data structure, such as an image.  
+// which would create a block of 16 threads across and 16 threads down,
+// if we wanted to use it in a 2D data structure, such as an image.  
 ```
 A **warp** is a group of 32 threads in a block. Each thread block is divided into warps, where the same instruction is executed (SIMD) -- you won't need to know much about this right now, but it's good to have an idea of how it works for the future. 
 
@@ -170,7 +169,7 @@ Lastly, the **grid** is where the thread blocks "live" on the GPU. Similarly to 
 int i = gridDim.x; // Grid dimension in the x axis
 ``` 
 
-In addition, the **kernel** is the function that runs on the GPU; it can be defined using  \_\_global\_\_, and invoked with <<<...>>>. The invocation can take parameters such as <<< number of blocks in the program, number of threads per block >>>, which can be defined by the programmer. 
+In addition, the **kernel** is the function that runs on the GPU; it can be defined using  \_\_global\_\_, and invoked with <<<...>>>. The invocation can take parameters such as: <<< number of blocks in the program, number of threads per block >>>, which can be defined by the programmer. 
 
 Below is an example of vector addition, illustrating the previous ideas:
 
@@ -194,17 +193,17 @@ int main()
 ```
 Please note: usually blocks and threads are in powers of 2 for easier computation. They are also always positive integers. 
 
-Below, we can see the different memory arrangements that exists in the GPU: 
+Below, we can see the different memory arrangements that exists in the GPU [6]: 
 
-![alt text](image-4.png) [6]
+![alt text](image-4.png) 
 
 The device memory in the image above is in our GPU, while the host memory is on the CPU. 
 
-There are two other declarations of a function that can be made- \_\_host\_\_ and \_\_device\_\_ , each one executed and called by the host and the device respectively. 
+There are two other declarations of a function that can be made- `\_\_host\_\_ ` and ` \_\_device\_\_ `, each one executed and called by the host and the device respectively. 
 
 Each block can have its own shared memory between threads, as mentioned, while each thread can have its own local memory- **global memory** is shared amongst all blocks, **constant memory** is read-only that remains constant, and **texture memory** is also read-only that is used for spatial locality and graphics (such as in 2D images). 
 
-Similar to the \_\_global\_\_ , \_\_host\_\_, and \_\_device\_\_ attributes, the \_\_device\_\_ ,  \_\_shared\_\_ and \_\_constant\_\_ attributes can be used in front of variables to declare where they should live within the memory of the GPU. 
+Similar to the `\_\_global\_\_ `, `\_\_host\_\_`, and `\_\_device\_\_` attributes, the `\_\_device\_\_` ,  `\_\_shared\_\_` and `\_\_constant\_\_` attributes can be used in front of variables to declare where they should live within the memory of the GPU. 
 
 **\_\_device\_\_** - a variable that lives in the global memory of the device (slower to access)  
 > great for large datasets
@@ -228,7 +227,7 @@ In short, a GPU is a highly parallel processing unit; in CUDA programming, tasks
 >#### Environment and Compilation
 First things first-setting up your environment. 
 
-CUDA programs have a .cu extension, and are executed using the nvcc compiler. To run a CUDA program, you first need to set up the makefile. 
+CUDA programs have a .cu extension, and are executed using the nvcc compiler. To run a CUDA program, you first need to set up the Makefile. 
 
 Theoretically-since this course is based on the NTUA course- you can open up your terminal and connect to the Scirouter. If you can't, then maybe a quick google search can help you, or a google-colab notebook as to have a GPU available. For the purposes of these notes however, this is what we will refer to. 
 
@@ -334,7 +333,7 @@ __global__ void vec_add(float* A, float* B, float* C, int len)
 }
 ```
 
-Here, the variable i represents the global ID of each thread. Generally, this is a common pattern for for-loops in CUDA, using i as the global thread ID, as seen below. 
+Here, the variable `i` represents the global ID of each thread. Generally, this is a common pattern for for-loops in CUDA, using `i` as the global thread ID, as seen below. 
 
 ```C++
 #include<iostream>
@@ -412,6 +411,8 @@ There are different cudaMemcpyKind kinds:
 
 - cudaMemcpyDeviceToDevice 
 
+Here, `cudaMemcpyHostToDevice` is used, as to transfer the data from the CPU to the GPU. 
+
 In addition, the block and grid dimensions need to be initialized with the dim3 command, such as:
 
 ```C++
@@ -419,7 +420,7 @@ In addition, the block and grid dimensions need to be initialized with the dim3 
     dim3 blockDim(32);
     dim3 gridDim((inputLength + blockDim.x - 1) / blockDim.x);
 ```
-So here, we have 32 threads per block (1 warp). We need to also take in consideration warp divergence: in CUDA, if 10 threads are needed, 32 will be implemented anyways because of how the hardware is built (Single Instruction Multiple Threads)- therefore, the block dimensions are maximized for efficiency and can be different for various programs, according to their needs. 
+So, in this case we have 32 threads per block, which is 1 warp. We need to also take in consideration warp divergence: in CUDA, if 10 threads are needed, 32 will be implemented anyways because of how the hardware is built (Single Instruction Multiple Threads)- therefore, the block dimensions are maximized for efficiency and can be different for various programs, according to their needs. This is also the reason of why you may notice that blocks are usually in powers of 2. 
 
 Thus, the block dimensions will be (32, 0, 0).
 
@@ -478,15 +479,15 @@ We allocated memory before, and now we have to free it. To do that on the GPU, t
     return 0;
 }
 ```
-And now we are done! Oof, that may have been a lot. Let's do a quick recap. 
+And now we are done! Let's do a quick recap. 
 
-- We defined our kernel function with the \_\_global\_\_ declaration.
+- We defined our kernel function with the `\_\_global\_\_` declaration.
 - Learned how to iterate through vectors in CUDA with the global thread ID.
-- Initialized memory on the GPU with CudaMalloc() and copied it from the CPU to the GPU (and vice-versa) using CudaMemcpy(). 
-- Initialized block and grid dimensions with the dim3 command. 
-- The bounded memory was then freed with cudaFree(). 
+- Initialized memory on the GPU with `CudaMalloc()` and copied it from the CPU to the GPU (and vice-versa) using `CudaMemcpy()`. 
+- Initialized block and grid dimensions with the `dim3` command. 
+- The bounded memory was then freed with `cudaFree()`. 
 
-TRY: Maybe adjust the vector addition kernel to a matrix addition kernel, and see how a double for-loop could work. (Hint: play around with the threadIdx.x, and the dim3 declaration). 
+TRY: Maybe adjust the vector addition kernel to a matrix addition kernel, and see how a double for-loop could work. (Hint: play around with the threadIdx.x, and the `dim3` declaration). 
 
 ## Matrix Multiplication and Measuring Speedup 
 
@@ -515,9 +516,9 @@ __global__ void matrix_multiplication(float *input1, float *input2, float *outpu
 
 }
 ```
-The main function can be left as an exercise implemented by the reader using the functions seen before; beware of the two-dimensional aspect of the matrices (and therefore dim3, as well as the size of each input/output element). There is also a solution in the github repo of these notes. 
+The main function can be left as an exercise implemented by the reader using the functions seen before; beware of the two-dimensional aspect of the matrices (and therefore `dim3`, as well as the size of each input/output element). There is also a solution in the code folder of these notes. 
 
-To see how long it would take for the program to run, a cudaEvent_t can be declared, before the kernel call. 
+To see how long it would take for the program to run, a `cudaEvent_t` can be declared, before the kernel call. 
 ```C++
     // Create CUDA events for timing
     cudaEvent_t start, stop;
@@ -544,7 +545,7 @@ To see how long it would take for the program to run, a cudaEvent_t can be decla
     cudaEventDestroy(stop);
 ```
 
-With the function cudaEventElapsedTime(), the time taken for a program to run can be measured, and then compared with the serial version (the matrix_multiplication.cpp file), in order to obtain the speedup. 
+With the function `cudaEventElapsedTime()`, the time taken for a program to run can be measured, and then compared with the serial version (the matrix_multiplication.cpp file), in order to obtain the speedup. 
 
 In the above code below, the runtime for the serial version was: 
 ```
@@ -561,7 +562,7 @@ In sum, the speedup is important so that we can understand if our code actually 
 
 Taking into consideration both the cost and time taken to run a program on the GPU (by the programmer) compared to a CPU, it is noticeably more. For example, GPU units cost on average 7025.19$ per month, per server, while CPU units cost 301.1$ per month, per server [7]. If running a program on a GPU would take 3 minutes, while running it on a CPU would take 30, then the clear winner in terms of cost and performance is clearly the GPU; since this is the case for a high speedup. However, if from 30 minutes on the CPU it speeds up to 29 minutes on the GPU, then justifying the cost becomes more difficult, since it is not only the hardware that is expensive but also the time taken to code on a GPU, because some algorithms need to be changed to be executed on them. 
 
-We have not seen any change in algorithms so far, but there is a reason why GPUs are meant for embarrassingly parallel programs, and why we don't use them for every program that exists. Their cores are designed in such a way that branches taken in the code hinder their performance a lot, making them even less useful than CPUs. Statistically, 20% of coding instructions are branches, therefore it would be unwise to use them instead of CPUs in all cases[9]. 
+We have not seen any change in algorithms so far, but there is a reason why GPUs are meant for embarrassingly parallel programs, and why we don't use them for every program that exists. Their cores are designed in such a way that branches taken in the code hinder their performance a lot, making them even less useful than CPUs. Statistically, 20% of coding instructions are branches, therefore it would be unwise to use them instead of CPUs in all cases [9]. 
 
 ## A Sum Computation and Synchronization 
 **Aim:** To understand fundamental synchronization techniques in CUDA, such as: 
@@ -620,7 +621,7 @@ Let's dissect this, step by step.
 __global__ void reductionKernel(int *input, int *output, int size) {
     __shared__ int sharedMem[THREADS_PER_BLOCK];
 ```
-The \_\_global\_\_ tag is used to indicate that this function is a kernel call. Next, the shared memory within the blocks is implemented using the  \_\_shared\_\_ attribute; the threads within each block having access to the sharedMem[] array, and so, have quicker access to this piece of data. 
+The `\_\_global\_\_ `tag is used to indicate that this function is a kernel call. Next, the shared memory within the blocks is implemented using the  `\_\_shared\_\_` attribute; the threads within each block having access to the sharedMem[] array, and so, have quicker access to this piece of data. 
 
 ```C++
     int tid = threadIdx.x;
@@ -637,7 +638,7 @@ The \_\_global\_\_ tag is used to indicate that this function is a kernel call. 
 ```
 The global index of each thread is declared as seen in the previous examples, and global memory is loaded into the shared memory. 
 
-The threads get synchronized using the __syncthreads(); call. This is a barrier synchronization so that we ensure that our result is correct and we don't have any "stray" threads after we have finished this computation. 
+The threads get synchronized using the `__syncthreads()` call. This is a **barrier synchronization** method, so that we ensure that our result is correct and we don't have any "stray" threads after we have finished this computation, and our computations are correct.
 
 Please note that generally, synchronization does impede performance, as it takes time for all the threads to get synchronized. Therefore, use it when needed. 
 
@@ -652,11 +653,11 @@ Please note that generally, synchronization does impede performance, as it takes
 ```
 This part is the reduction of each block, and this is a common procedure for a dot product calculation as well (or even a histogram). The goal is to reduce the data stored in the shared memory to the sum of all the elements in the block. 
 
-The for loop starts with half the number of threads in the block, and the stride gets halved for every iteration using the shift right operator. 
+The `for` loop starts with half the number of threads in the block, and the stride gets halved for every iteration using the shift right operator. 
 
-The if block ensures that each thread adds the value of a neighboring element in the shared memory to its own, computing the sum. 
+The `if` block ensures that each thread adds the value of a neighboring element in the shared memory to its own, computing the sum. 
 
-There is barrier synchronization once again, making sure that _all_ threads in the block reach this point before continuing onto the next, as without this some threads may read unchanged data, and the computation would be wrong. 
+There is barrier synchronization once again, making sure that _all_ threads in the block reach this point before continuing onto the next, as without this some threads may read unchanged data, and the calculation would be wrong. 
 
 If you are more of a visual learner, the image below may aid in seeing how it would look like:
 
@@ -674,7 +675,7 @@ But what does atomicAdd() do, and why is it needed?
 
 This is to prevent race conditions (as with the pen example, so chaos does not ensue), as each block is processed in parallel and simultaneous writes can cause conflicts. 
 
-Overall, __syncthreads() is used for synchronization within a block, ensuring that all threads have reached a "checkpoint" before proceeding to the next step. On the other hand, atomicAdd() and other atomic operations (check out more documentation in the NVIDIA Docs) are mostly used when multiple threads across blocks are doing concurrent writes and race conditions want to be avoided. 
+Overall, `__syncthreads()` is used for synchronization within a block, ensuring that all threads have reached a "checkpoint" before proceeding to the next step. On the other hand, atomicAdd() and other atomic operations (check out more documentation in the NVIDIA Docs [16]) are mostly used when multiple threads across blocks are doing concurrent writes, and race conditions want to be avoided. 
 
 
 ## Parallelized BFS 
@@ -689,20 +690,21 @@ This is left as an exercise to the reader - a template is given, as well as a so
 **Aim:** To learn how to manage memory more effectively, comprehending CUDA streams and pinned memory, as well as see how they can be utilized. 
 
 Pinned memory is memory in the CPU that is page-locked, meaning it can't be swapped out to the disk by the computer's OS. 
+
+
 ![ ](image-6.png)[10]
  
-This is used in CUDA programming because it is much faster, since no data is transferred between the pageable memory and the pinned buffer, making it always available for data transfers in the GPU. However, it is limited in its storing capacity, and can't be used at all times; in addition, allocating is also slower [10]. 
+This is used in CUDA programming because it is much faster, since no data is transferred between the pageable memory and the pinned buffer, making it always available for data transfers in the GPU. However, it is limited in its storing capacity, and can't be used at all times; in addition, allocating is slower [10]. 
 
-CUDA streams, on the other hand, are ordered sequences of operations, such as kernel executions or memory transfers.These operations are asynchronous, meaning they don’t wait for one task to finish before starting another. This key difference allows streams to run concurrently, making them highly beneficial for efficiency. Multiple streams can be leveraged to enhance performance, especially in scenarios where computation overlaps with memory transfers, as they allow tasks to run simultaneously [11].
+CUDA streams, on the other hand, are ordered sequences of operations, such as kernel executions or memory transfers. These operations are asynchronous, meaning they don’t wait for one task to finish before starting another. This key difference allows streams to run concurrently, making them highly beneficial for efficiency. Multiple streams can be leveraged to enhance performance, especially in scenarios where computation overlaps with memory transfers, as they allow tasks to run simultaneously [11].
 
-In contrast, synchronous execution, which we've primarily discussed so far, refers to functions like `cudaMemcpy`, where the function only returns once the copy operation is fully complete--each task must finish before the other one can start. Asynchronous commands and streams, however, break this pattern, and can be implemented as shown in the image below.
+In contrast, synchronous execution, refers to functions like `cudaMemcpy`, where the function only returns once the copy operation is fully complete--each task must finish before the other one can start. Asynchronous commands and streams, however, break this pattern, and can be illustrated as shown in the image below [11].
 
  ![
      []
  ](image-7.png)
-[11]
 
- 
+ ---
 Next, we will discuss a vector addition kernel, similar to our first example, using pinned memory and streams (see vecadd_stream_and_pinned.cu). 
 
 We have defined the kernel for vector addition previously, and we will take a closer look into the main function. 
@@ -733,7 +735,7 @@ Continuing, pinned memory is allocated, and the data used is initialized.
         hostInput2[i] = static_cast<float>(rand()) / RAND_MAX;
     }
 ```
-The `cudaHostAlloc()` function is used, similarly to the `cudaMalloc()` function that has been mentioned previously. Although, this time 
+The `cudaHostAlloc()` function is used, similarly to the `cudaMalloc()` function that has been mentioned previously. Although, this time _pinned_ memory is allocated, therefore another function must be called.
 
 
 ```C++
@@ -821,15 +823,15 @@ As we've done so far, the last step would be to free all the memory we have allo
 
 And...done! 
 
-Recapping, ways in which memory can be managed in a more effective manner have been emphasized-- pinned memory, and CUDA streams, as well as how to implement them in  an asynchronous manner using: `cudaHostAlloc()` for pinned memory and `cudaMemcpyAsync()` for streams.
+In conclusion, ways in which memory can be managed in a more effective manner have been emphasized-- pinned memory, and CUDA streams, as well as how to implement them in  an asynchronous manner using: `cudaHostAlloc()` for pinned memory and `cudaMemcpyAsync()` for streams.
 
-All utilized in order to make performance even more efficient.
+These both methods are utilized in order to make performance even more efficient.
  
 ## Summary
 
 In sum, this series of notes has highlighted key techniques of parallel programming, showcasing real-world examples to illustrate their effectiveness. We began with an introduction to parallel programming principles and examined GPU architecture, which is essential for understanding how to use CUDA. 
 
-After learning the basic theory, practical applications ensued, such as vector addition and matrix multiplication, including methods for measuring speedup. Additionally, we explored concepts like sum computation with synchronization and left the implementation of parallelized breadth-first search (BFS) to the reader, showing how GPUs can not only be used in matrix operations, but other data structures like graphs as well. Advanced topics covered include the use of streams and pinned memory to optimize performance in vector addition tasks.
+After learning the basic theory, practical applications ensued, such as vector addition and matrix multiplication, including methods for measuring speedup. Additionally, we explored concepts like sum computation with synchronization and left the implementation of parallelized breadth-first search (BFS) to the reader, showing how GPUs can not only be used in matrix operations, but other data structures like graphs as well. Lastly, slightly more advanced topics were covered, including the use of streams and pinned memory to optimize performance in vector addition tasks.
 
  Understanding CUDA is particularly important now, as the demand for efficient processing of large datasets continues to rise in fields like artificial intelligence and data analysis. Future work could focus on optimizing more complex algorithms, integrating CUDA with other programming frameworks, or exploring the potential of hybrid CPU-GPU approaches to further enhance computational efficiency.
  

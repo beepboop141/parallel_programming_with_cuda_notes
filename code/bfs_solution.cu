@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 
     // Kernel launch (use global or block queuing)
     gpu_global_queuing(nodePtrs_d, nodeNeighbors_d, nodeVisited_d, currLevelNodes_d, nextLevelNodes_d, numCurrLevelNodes, numNextLevelNodes_d);
-    // Alternatively, you can use:
+    // Alternatively:
     // gpu_block_queuing(nodePtrs_d, nodeNeighbors_d, nodeVisited_d, currLevelNodes_d, nextLevelNodes_d, numCurrLevelNodes, numNextLevelNodes_d);
 
     // Wait for GPU to finish

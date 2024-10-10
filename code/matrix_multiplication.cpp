@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <cstdlib> // For rand()
-#include <ctime>   // For time()
-#include <chrono>  // For high-resolution clock
+#include <cstdlib> 
+#include <ctime>   
+#include <chrono>  
 
 // Function to multiply two matrices
 void matrix_multiply(const std::vector<std::vector<float>>& input1, 
