@@ -199,11 +199,11 @@ Below, we can see the different memory arrangements that exists in the GPU [6]:
 
 The device memory in the image above is in our GPU, while the host memory is on the CPU. 
 
-There are two other declarations of a function that can be made- `\_\_host\_\_ ` and ` \_\_device\_\_ `, each one executed and called by the host and the device respectively. 
+There are two other declarations of a function that can be made- `__host__ ` and ` __device__ `, each one executed and called by the host and the device respectively. 
 
 Each block can have its own shared memory between threads, as mentioned, while each thread can have its own local memory- **global memory** is shared amongst all blocks, **constant memory** is read-only that remains constant, and **texture memory** is also read-only that is used for spatial locality and graphics (such as in 2D images). 
 
-Similar to the `\_\_global\_\_ `, `\_\_host\_\_`, and `\_\_device\_\_` attributes, the `\_\_device\_\_` ,  `\_\_shared\_\_` and `\_\_constant\_\_` attributes can be used in front of variables to declare where they should live within the memory of the GPU. 
+Similar to the `__global__ `, `__host__`, and `__device__` attributes, the `__device__` ,  `__shared__` and `__constant__` attributes can be used in front of variables to declare where they should live within the memory of the GPU. 
 
 **\_\_device\_\_** - a variable that lives in the global memory of the device (slower to access)  
 > great for large datasets
@@ -481,7 +481,7 @@ We allocated memory before, and now we have to free it. To do that on the GPU, t
 ```
 And now we are done! Let's do a quick recap. 
 
-- We defined our kernel function with the `\_\_global\_\_` declaration.
+- We defined our kernel function with the `__global__` declaration.
 - Learned how to iterate through vectors in CUDA with the global thread ID.
 - Initialized memory on the GPU with `CudaMalloc()` and copied it from the CPU to the GPU (and vice-versa) using `CudaMemcpy()`. 
 - Initialized block and grid dimensions with the `dim3` command. 
@@ -621,7 +621,7 @@ Let's dissect this, step by step.
 __global__ void reductionKernel(int *input, int *output, int size) {
     __shared__ int sharedMem[THREADS_PER_BLOCK];
 ```
-The `\_\_global\_\_ `tag is used to indicate that this function is a kernel call. Next, the shared memory within the blocks is implemented using the  `\_\_shared\_\_` attribute; the threads within each block having access to the sharedMem[] array, and so, have quicker access to this piece of data. 
+The `__global__ `tag is used to indicate that this function is a kernel call. Next, the shared memory within the blocks is implemented using the  `__shared__` attribute; the threads within each block having access to the sharedMem[] array, and so, have quicker access to this piece of data. 
 
 ```C++
     int tid = threadIdx.x;
@@ -868,7 +868,7 @@ After learning the basic theory, practical applications ensued, such as vector a
 [10] M. Fatica and G. Ruetsch, “Optimization,” _Elsevier eBooks_, pp. 43–114, Oct. 2013, doi: https://doi.org/10.1016/b978-0-12-416970-8.00003-1.
 ‌
 
-[11]“Lecture 22,” _Une.edu.au_, 2024. https://turing.une.edu.au/~cosc330/lectures/display_notes.php?lecture=22 (accessed Oct. 10, 2024).
+[11] “Lecture 22,” _Une.edu.au_, 2024. https://turing.une.edu.au/~cosc330/lectures/display_notes.php?lecture=22 (accessed Oct. 10, 2024).
 ‌
 
 [12] W. W. Hwu, D. B. Kirk, and Izzat El Hajj, _Programming Massively Parallel Processors_. Morgan Kaufmann, 2022.
