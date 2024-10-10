@@ -14,7 +14,7 @@ By Maria Tzevelekou
 1. Summary
 
 
-### Introduction 
+## Introduction 
 
 HPC (also known as High-performance Computing) is a way to perform complicated computations with large volumes of data. Supercomputers are the ones that are used to execute said operations, via parallel processing. This way, a task is broken into smaller sub-tasks and those are executed simultaneously; thus, usually, the time taken for a process is much faster than normal (as seen in serial execution).  
 
@@ -45,7 +45,7 @@ These notes are based on the book Programming Massively Parallel Processors by D
 
 (*) Beware: faster does not mean more efficient; performance, convenience, and cost are all taken into consideration when designing a parallel program.
 
-### Introduction to Parallel Programming 
+## Introduction to Parallel Programming 
 
 **Aim** : To understand basic parallel programming principles such as: 
 
@@ -121,7 +121,7 @@ Sometimes, the speedup of a program may be unexpected (in a bad way), and many t
 This happens because of the nature of parallel programming; some tasks may require more work than others and take more time, or can't be parallelized at all. Synchronization also takes more time. Data may need to be accessed simultaneously, and the bandwidth of a system may not be sufficient enough to support it. Sometimes, certain algorithms just aren't built to be parallelized and have to be changed to do so. 
 
 
-### GPU Architecture
+## GPU Architecture
 
 **Aim** : To learn what a GPU is, and its architecture, along with the meanings of:
 
@@ -222,7 +222,7 @@ In short, a GPU is a highly parallel processing unit; in CUDA programming, tasks
 
 
 
-### Writing Your First Program (yay!!!)
+## Writing Your First Program 
 **Aim** : To see and then implement a CUDA program on your own.
 
 >#### Environment and Compilation
@@ -314,7 +314,7 @@ cudaDeviceSynchronize();
 When a kernel is launched in a CUDA program, it is done so asynchronously- the CPU does not wait for the GPU to finish, as they are different pieces of hardware, so we need to add a "reminder" for it to do so. 
 
 
-### Vector Addition in CUDA (and CudaMalloc)
+## Vector Addition in CUDA (and CudaMalloc)
 **Aim:** To write a vector addition program in CUDA and understand how allocating memory works. 
 
 Looking back at an initial example given before, let's try to write a vector addition program in CUDA. 
@@ -488,7 +488,7 @@ And now we are done! Oof, that may have been a lot. Let's do a quick recap.
 
 TRY: Maybe adjust the vector addition kernel to a matrix addition kernel, and see how a double for-loop could work. (Hint: play around with the threadIdx.x, and the dim3 declaration). 
 
-### Matrix Multiplication and Measuring Speedup 
+## Matrix Multiplication and Measuring Speedup 
 
 **Aim:** To perform matrix multiplication and measure the time taken for a program to run in CUDA. 
 
@@ -563,7 +563,7 @@ Taking into consideration both the cost and time taken to run a program on the G
 
 We have not seen any change in algorithms so far, but there is a reason why GPUs are meant for embarrassingly parallel programs, and why we don't use them for every program that exists. Their cores are designed in such a way that branches taken in the code hinder their performance a lot, making them even less useful than CPUs. Statistically, 20% of coding instructions are branches, therefore it would be unwise to use them instead of CPUs in all cases[9]. 
 
-### A Sum Computation and Synchronization 
+## A Sum Computation and Synchronization 
 **Aim:** To understand fundamental synchronization techniques in CUDA, such as: 
 - __syncthreads();
 
@@ -677,14 +677,14 @@ This is to prevent race conditions (as with the pen example, so chaos does not e
 Overall, __syncthreads() is used for synchronization within a block, ensuring that all threads have reached a "checkpoint" before proceeding to the next step. On the other hand, atomicAdd() and other atomic operations (check out more documentation in the NVIDIA Docs) are mostly used when multiple threads across blocks are doing concurrent writes and race conditions want to be avoided. 
 
 
-### Parallelized BFS 
+## Parallelized BFS 
 
 **Aim:** To see how CUDA can be used in graph algorithms.
 
 This is left as an exercise to the reader - a template is given, as well as a solution. Given the information in these notes (and maybe some googling if you get stuck) you have all of the tools at your disposal to implement it. 
 
 
-### Streams and Pinned Memory with Vector Addition
+## Streams and Pinned Memory with Vector Addition
 
 **Aim:** To learn how to manage memory more effectively, comprehending CUDA streams and pinned memory, as well as see how they can be utilized. 
 
